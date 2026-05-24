@@ -20,7 +20,12 @@
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
     "identity:db:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate src/module/identity/persistence/migration/migration -d src/module/identity/persistence/typeorm-datasource.ts",
     "identity:db:migrate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/module/identity/persistence/typeorm-datasource.ts",
-    "identity:db:drop": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop -d src/module/identity/persistence/typeorm-datasource.ts"
+    "identity:db:drop": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:drop -d src/module/identity/persistence/typeorm-datasource.ts",
+    "db:migrate:all": "yarn identity:db:migrate",
+    "services:up:database": "docker compose -f infra/compose.yml up -d",
+    "services:wait:database": "node infra/scripts/wait-for-postgres.js",
+    "services:down:database": "docker compose -f infra/compose.yml down",
+    "test:e2e:setup": "yarn services:up:database && yarn services:wait:database && yarn db:migrate:all && yarn test:e2e"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -68,6 +73,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "typeorm-model-generator": "^0.4.6",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   },

@@ -15,6 +15,14 @@ export const factory = (): Config => {
       username: process.env.DATABASE_USERNAME,
       schema: process.env.DATABASE_SCHEMA ?? 'public',
     },
+    examDatabase: {
+      host: process.env.EXAM_DATABASE_HOST,
+      database: process.env.EXAM_DATABASE_NAME,
+      password: process.env.EXAM_DATABASE_PASSWORD,
+      port: process.env.EXAM_DATABASE_PORT,
+      username: process.env.EXAM_DATABASE_USERNAME,
+      schema: process.env.EXAM_DATABASE_SCHEMA ?? 'central_teste',
+    },
     jwt: {
       secret: process.env.JWT_SECRET,
     },

@@ -25,9 +25,19 @@ export const jwtSchema = z.object({
   secret: z.string(),
 });
 
+export const examDatabaseSchema = z.object({
+  host: z.string(),
+  database: z.string(),
+  password: z.string(),
+  port: z.coerce.number().default(5432),
+  username: z.string(),
+  schema: z.string().default('central_teste'),
+});
+
 export const configSchema = z.object({
   env: environmentSchema,
   port: z.coerce.number().positive().int(),
   database: databaseSchema,
+  examDatabase: examDatabaseSchema,
   jwt: jwtSchema,
 });
