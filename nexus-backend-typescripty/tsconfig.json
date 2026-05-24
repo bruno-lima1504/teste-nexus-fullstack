@@ -33,9 +33,6 @@
       "@examModule/*": [
         "./src/module/exam/*"
       ],
-      "@billingModule/*": [
-        "./src/module/billing/*"
-      ],
       "@identityModule/*": [
         "./src/module/identity/*"
       ],

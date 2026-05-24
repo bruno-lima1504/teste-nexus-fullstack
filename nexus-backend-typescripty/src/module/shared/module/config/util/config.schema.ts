@@ -21,10 +21,13 @@ export const billingApiSchema = z.object({
   url: z.string(),
 });
 
+export const jwtSchema = z.object({
+  secret: z.string(),
+});
+
 export const configSchema = z.object({
   env: environmentSchema,
   port: z.coerce.number().positive().int(),
   database: databaseSchema,
-  movieDb: movieDbSchema,
-  billingApi: billingApiSchema,
+  jwt: jwtSchema,
 });

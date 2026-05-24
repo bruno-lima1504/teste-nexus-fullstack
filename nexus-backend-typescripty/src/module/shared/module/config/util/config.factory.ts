@@ -15,6 +15,9 @@ export const factory = (): Config => {
       username: process.env.DATABASE_USERNAME,
       schema: process.env.DATABASE_SCHEMA ?? 'public',
     },
+    jwt: {
+      secret: process.env.JWT_SECRET,
+    },
   });
 
   if (result.success) {
