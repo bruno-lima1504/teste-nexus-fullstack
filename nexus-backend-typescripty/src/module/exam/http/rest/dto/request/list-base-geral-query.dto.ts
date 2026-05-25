@@ -20,8 +20,9 @@ export class ListBaseGeralQueryDto {
   nomeColaborador?: string;
 
   @IsOptional()
-  @IsString()
-  ticket?: string;
+  @Type(() => Number)
+  @IsInt()
+  ticket?: number;
 
   @IsOptional()
   @IsString()

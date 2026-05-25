@@ -5,8 +5,8 @@ export class BaseGeral {
   @PrimaryColumn()
   id: number;
 
-  @Column({ nullable: true })
-  ticket?: string;
+  @Column({ type: 'int', nullable: true })
+  ticket?: number;
 
   @Column({ nullable: true })
   solicitante?: string;

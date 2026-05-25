@@ -6,7 +6,7 @@ export async function bootstrapExamTestSchema(client: Knex) {
   await client.raw(`
     CREATE TABLE central_teste.base_geral (
       id integer PRIMARY KEY,
-      ticket varchar,
+      ticket integer,
       solicitante text,
       data_solicitacao date,
       etapa_atual text,

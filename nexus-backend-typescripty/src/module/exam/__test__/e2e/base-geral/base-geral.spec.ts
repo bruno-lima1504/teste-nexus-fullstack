@@ -12,21 +12,21 @@ import { createNestApp } from '../../../../../../test/jest-e2e.setup';
 const seedRecords = [
   {
     id: 1,
-    ticket: '155430',
+    ticket: 155430,
     nome_colaborador: 'TAIS',
     tipo_exame: 'Admissional',
     status: 'Finalizado no SOC/GED',
   },
   {
     id: 2,
-    ticket: '155431',
+    ticket: 155431,
     nome_colaborador: 'JOAO',
     tipo_exame: 'Periodico',
     status: 'Pendente',
   },
   {
     id: 3,
-    ticket: '155432',
+    ticket: 155432,
     nome_colaborador: 'MARIA',
     tipo_exame: 'Admissional',
     status: 'Finalizado no SOC/GED',
@@ -151,7 +151,7 @@ describe('BaseGeralController (e2e)', () => {
       });
       expect(response.body.data[0]).toMatchObject({
         id: 1,
-        ticket: '155430',
+        ticket: 155430,
         nomeColaborador: 'TAIS',
         tipoExame: 'Admissional',
         status: 'Finalizado no SOC/GED',
@@ -179,12 +179,12 @@ describe('BaseGeralController (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .get('/exam/base-geral')
-        .query({ ticket: '155431' })
+        .query({ ticket: 155431 })
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.data).toHaveLength(1);
-      expect(response.body.data[0].ticket).toBe('155431');
+      expect(response.body.data[0].ticket).toBe(155431);
       expect(response.body.meta.total).toBe(1);
     });
 
