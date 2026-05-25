@@ -3,6 +3,7 @@ import { UserRepository } from '@identityModule/persistence/repository/user.repo
 import { Injectable } from '@nestjs/common';
 import { hash } from 'bcrypt';
 import { UserBadRequestException } from '@identityModule/core/exception/user-badrequest.exception';
+import { AppLogger } from '@sharedModule/logger/service/app-logger.service';
 
 export interface CreateUserDto {
   email: string;
@@ -16,7 +17,10 @@ export const PASSWORD_HASH_SALT = 10;
 
 @Injectable()
 export class UserManagementService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly logger: AppLogger,
+  ) {}
   async create(user: CreateUserDto) {
     const newUser = new User({
       ...user,
@@ -28,6 +32,10 @@ export class UserManagementService {
     if (!createdUser) {
       throw new UserBadRequestException('Failed to create user');
     }
+
+    this.logger.log(`User ${createdUser.email} created`, {
+      createdUser,
+    });
 
     return newUser;
   }

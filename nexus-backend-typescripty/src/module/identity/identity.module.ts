@@ -5,9 +5,10 @@ import { UserController } from '@identityModule/http/rest/controller/user.contro
 import { IdentityPersistenceModule } from '@identityModule/persistence/identity-persistence.module';
 import { Module } from '@nestjs/common';
 import { AuthModule } from '@sharedModule/auth/auth.module';
+import { LoggerModule } from '@sharedModule/logger/logger.module';
 
 @Module({
-  imports: [IdentityPersistenceModule, AuthModule],
+  imports: [IdentityPersistenceModule, AuthModule, LoggerModule],
   controllers: [UserController, AuthController],
   providers: [AuthService, UserManagementService],
 })

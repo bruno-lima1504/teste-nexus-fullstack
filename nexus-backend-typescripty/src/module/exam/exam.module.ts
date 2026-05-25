@@ -4,9 +4,10 @@ import { BaseGeralController } from '@examModule/http/rest/controller/base-geral
 import { ExamPersistenceModule } from '@examModule/persistence/exam-persistence.module';
 import { Module } from '@nestjs/common';
 import { AuthModule } from '@sharedModule/auth/auth.module';
+import { LoggerModule } from '@sharedModule/logger/logger.module';
 
 @Module({
-  imports: [ExamPersistenceModule, AuthModule],
+  imports: [ExamPersistenceModule, AuthModule, LoggerModule],
   controllers: [BaseGeralController],
   providers: [BaseGeralService, BaseGeralFilterMapper],
 })

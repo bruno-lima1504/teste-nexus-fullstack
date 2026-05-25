@@ -2,6 +2,7 @@ import { UserUnauthorizedException } from '@identityModule/core/exception/user-u
 import { UserRepository } from '@identityModule/persistence/repository/user.repository';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { AppLogger } from '@sharedModule/logger/service/app-logger.service';
 import { compare } from 'bcrypt';
 
 @Injectable()
@@ -9,6 +10,7 @@ export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
+    private readonly logger: AppLogger,
   ) {}
 
   async getProfile(userId: string): Promise<{ email: string }> {
@@ -32,6 +34,11 @@ export class AuthService {
 
     //TODO add more fields to the JWT
     const payload = { sub: user.id };
+
+    this.logger.log(`User ${user.email} signed in`, {
+      payload,
+    });
+
     return {
       accessToken: await this.jwtService.signAsync(payload, {
         // Using HS256 algorithm to prenvent from security risk
