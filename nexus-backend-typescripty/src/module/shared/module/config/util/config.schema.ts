@@ -25,6 +25,13 @@ export const jwtSchema = z.object({
   secret: z.string(),
 });
 
+export const throttlerSchema = z.object({
+  ttl: z.coerce.number().default(60_000),
+  limit: z.coerce.number().default(100),
+  signInLimit: z.coerce.number().default(5),
+  registerLimit: z.coerce.number().default(3),
+});
+
 export const examDatabaseSchema = z.object({
   host: z.string(),
   database: z.string(),
@@ -40,4 +47,5 @@ export const configSchema = z.object({
   database: databaseSchema,
   examDatabase: examDatabaseSchema,
   jwt: jwtSchema,
+  throttler: throttlerSchema,
 });

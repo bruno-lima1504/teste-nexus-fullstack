@@ -10,7 +10,9 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthGuard } from '@sharedModule/auth/guard/auth.guard';
+import { signInThrottle } from '@sharedModule/throttler/util/throttle-limits.util';
 import { ClsService } from 'nestjs-cls';
 import { SignInRequestDto } from '../dto/request/sign-in-request.dto';
 
@@ -22,6 +24,7 @@ export class AuthController {
   ) {}
 
   @Post('sign-in')
+  @Throttle(signInThrottle)
   @HttpCode(HttpStatus.OK)
   async signIn(@Body() signInDto: SignInRequestDto) {
     try {
