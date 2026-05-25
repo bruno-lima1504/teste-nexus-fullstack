@@ -285,4 +285,52 @@ describe('BaseGeralController (e2e)', () => {
       );
     });
   });
+  describe('GET /exam/base-geral/:id', () => {
+    it('returns 401 without Authorization header', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/exam/base-geral/1')
+        .expect(401);
+
+      expect(response.body.message).toEqual('Unauthorized');
+    });
+
+    it('returns 200 with the correct record', async () => {
+      await seedBaseGeral();
+      const token = await getAccessToken(app, userManagementService);
+
+      const response = await request(app.getHttpServer())
+        .get('/exam/base-geral/1')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      expect(response.body).toMatchObject({
+        id: 1,
+        ticket: 155430,
+        nomeColaborador: 'TAIS',
+        tipoExame: 'Admissional',
+        status: 'Finalizado no SOC/GED',
+      });
+    });
+
+    it('returns 404 when id does not exist', async () => {
+      const token = await getAccessToken(app, userManagementService);
+
+      const response = await request(app.getHttpServer())
+        .get('/exam/base-geral/9999')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(404);
+
+      expect(response.body.message).toContain('9999');
+    });
+
+    it('returns 400 for non-numeric id', async () => {
+      const token = await getAccessToken(app, userManagementService);
+
+      await request(app.getHttpServer())
+        .get('/exam/base-geral/abc')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(400);
+    });
+  });
+
 });

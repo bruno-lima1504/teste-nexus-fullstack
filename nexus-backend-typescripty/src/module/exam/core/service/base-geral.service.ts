@@ -1,7 +1,7 @@
 import { BaseGeralFilterMapper } from '@examModule/core/util/base-geral-filter.mapper';
 import { ListBaseGeralQueryDto } from '@examModule/http/rest/dto/request/list-base-geral-query.dto';
 import { BaseGeralRepository } from '@examModule/persistence/repository/base-geral.repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PaginatedResult } from '@sharedModule/persistence/typeorm/type/pagination.type';
 import { BaseGeral } from '@examModule/persistence/entity/base-geral.entity';
 
@@ -27,5 +27,11 @@ export class BaseGeralService {
       page: query.page,
       limit: query.limit,
     });
+  }
+
+  async findOneById(id: number): Promise<BaseGeral> {
+    const result = await this.baseGeralRepository.findOneById(id);
+    if (!result) throw new NotFoundException(`Exame com id ${id} não encontrado`);
+    return result;
   }
 }
