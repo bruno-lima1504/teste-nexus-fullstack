@@ -332,5 +332,4 @@ describe('BaseGeralController (e2e)', () => {
         .expect(400);
     });
   });
-
 });

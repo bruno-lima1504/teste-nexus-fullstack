@@ -1,98 +1,141 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Nexus Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST construída com NestJS 11 e TypeScript. O backend gerencia autenticação de usuários e consulta de exames, utilizando dois bancos PostgreSQL independentes.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Visão geral
 
-## Description
+| Módulo | Variáveis de ambiente | Finalidade |
+|--------|----------------------|------------|
+| **Identity** | `DATABASE_*` | Usuários, autenticação JWT e migrations locais |
+| **Exam** | `EXAM_DATABASE_*` | Leitura read-only da tabela `central_teste.base_geral` em banco externo |
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Pré-requisitos
 
-## Project setup
+- Node.js 18+ (recomendado 20+)
+- [Yarn](https://yarnpkg.com/)
+- Docker e Docker Compose (para o Postgres local do módulo identity)
+- Acesso ao banco PostgreSQL real de exames (`central_teste`)
+
+## Inicialização do projeto
 
 ```bash
-$ yarn install
+cd nexus-backend-typescripty
+yarn install
+cp .env.default .env
 ```
 
-## Compile and run the project
+Edite o arquivo `.env` conforme descrito nas seções abaixo — especialmente as credenciais `EXAM_DATABASE_*` e o `JWT_SECRET`.
+
+Em seguida, suba o banco local, rode as migrations e inicie a aplicação:
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+yarn services:up:database
+yarn services:wait:database
+yarn identity:db:migrate
+yarn start:dev
 ```
 
-## Run tests
+A API estará disponível em **http://localhost:3000**.
+
+## Configuração de variáveis de ambiente
+
+O arquivo `.env` é criado a partir de [`.env.default`](./.env.default). Copie o template e preencha os valores reais antes de iniciar a aplicação.
+
+### Variáveis gerais
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `NODE_ENV` | `development` | Ambiente de execução (`development`, `test` ou `production`) |
+| `PORT` | `3000` | Porta HTTP da API |
+
+### Banco identity (`DATABASE_*`)
+
+Usado pelo módulo de autenticação e usuários. Em desenvolvimento, os valores padrão já estão alinhados com o Postgres provisionado pelo Docker Compose local.
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `DATABASE_HOST` | `localhost` | Host do Postgres identity |
+| `DATABASE_PORT` | `5432` | Porta do Postgres identity |
+| `DATABASE_USERNAME` | `postgres` | Usuário do banco identity |
+| `DATABASE_PASSWORD` | `postgres` | Senha do banco identity |
+| `DATABASE_NAME` | `postgres` | Nome do banco identity |
+| `DATABASE_SCHEMA` | `public` | Schema do banco identity |
+| `DATABASE_URL` | *(gerada)* | URL completa de conexão |
+
+### Banco de exames (`EXAM_DATABASE_*`)
+
+Usado pelo módulo exam para consulta read-only. **Os placeholders do `.env.default` não funcionam em desenvolvimento** — substitua pelas credenciais reais do banco de exames.
+
+| Variável | Placeholder no `.env.default` | O que preencher |
+|----------|-------------------------------|-----------------|
+| `EXAM_DATABASE_HOST` | `localhost` | Host do servidor PostgreSQL real (ex.: RDS, IP interno) |
+| `EXAM_DATABASE_PORT` | `5432` | Porta do banco |
+| `EXAM_DATABASE_USERNAME` | `postgres` | Usuário com permissão de leitura |
+| `EXAM_DATABASE_PASSWORD` | `your-exam-database-password` | Senha real do banco |
+| `EXAM_DATABASE_NAME` | `central_teste` | Nome do banco (manter se igual ao ambiente) |
+| `EXAM_DATABASE_SCHEMA` | `central_teste` | Schema onde existe a tabela `base_geral` |
+
+#### Pontos importantes sobre o banco de exames
+
+- O Docker Compose local ([`infra/compose.yml`](./infra/compose.yml)) **só provisiona** o Postgres do módulo identity. Ele **não** cria o banco nem o schema `central_teste`.
+- O módulo exam é **read-only** e não possui migrations. A tabela `base_geral` deve já existir no banco externo.
+- Em `development`, a conexão exam usa SSL com `rejectUnauthorized: false` (comum em bancos gerenciados como RDS).
+- Solicite as credenciais reais à equipe responsável pelo banco de exames antes de iniciar o desenvolvimento.
+
+#### Exemplo de `.env` com credenciais preenchidas
+
+```env
+EXAM_DATABASE_HOST=meu-servidor.exemplo.com
+EXAM_DATABASE_PORT=5432
+EXAM_DATABASE_USERNAME=leitor_exames
+EXAM_DATABASE_PASSWORD=senha-segura-aqui
+EXAM_DATABASE_NAME=central_teste
+EXAM_DATABASE_SCHEMA=central_teste
+```
+
+### Autenticação e rate limiting
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `JWT_SECRET` | `your-jwt-secret-key` | Secret para assinatura dos tokens JWT — **troque por um valor seguro** |
+| `THROTTLER_TTL` | `60000` | Janela de rate limit em milissegundos |
+| `THROTTLER_LIMIT` | `100` | Limite global de requisições por janela |
+| `THROTTLER_SIGN_IN_LIMIT` | `5` | Limite de requisições em `/auth/sign-in` |
+| `THROTTLER_REGISTER_LIMIT` | `3` | Limite de requisições em `/user/register` |
+
+## Scripts úteis
+
+| Script | Descrição |
+|--------|-----------|
+| `yarn start:dev` | Inicia a API em modo desenvolvimento com hot reload |
+| `yarn build` | Compila o projeto para `dist/` |
+| `yarn start:prod` | Inicia a API a partir do build compilado |
+| `yarn lint` | Executa o ESLint |
+| `yarn test` | Roda testes unitários |
+| `yarn test:e2e` | Roda testes end-to-end |
+| `yarn test:e2e:setup` | Sobe o banco, roda migrations e executa os testes e2e |
+| `yarn identity:db:migrate` | Executa migrations do módulo identity |
+| `yarn db:migrate:all` | Executa todas as migrations (atualmente só identity) |
+| `yarn services:up:database` | Sobe o Postgres local via Docker Compose |
+| `yarn services:wait:database` | Aguarda o Postgres local ficar pronto |
+| `yarn services:down:database` | Para o Postgres local |
+
+## Endpoints principais
+
+| Método | Rota | Descrição | Autenticação |
+|--------|------|-----------|--------------|
+| `POST` | `/user/register` | Registro de usuário | Não |
+| `POST` | `/auth/sign-in` | Login (retorna JWT) | Não |
+| `GET` | `/auth/profile` | Perfil do usuário autenticado | Sim |
+| `GET` | `/exam/base-geral` | Listagem paginada de exames | Sim |
+| `GET` | `/exam/base-geral/:id` | Detalhe de um exame por ID | Sim |
+
+## Testes
+
+Para rodar os testes e2e com setup completo (banco + migrations):
 
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+yarn test:e2e:setup
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Os testes exigem os arquivos `.env` e `.env.test`. Copie o `.env.default` para ambos e ajuste os valores de teste conforme necessário.
