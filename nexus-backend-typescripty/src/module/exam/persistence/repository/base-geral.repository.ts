@@ -19,7 +19,7 @@ export class BaseGeralRepository extends ReadOnlyTypeOrmRepository<BaseGeral> {
     });
   }
 
-  async findOneByTicket(ticket: string): Promise<BaseGeral | null> {
+  async findOneByTicket(ticket: number): Promise<BaseGeral | null> {
     return this.findOne({
       where: { ticket },
     });

@@ -12,21 +12,21 @@ import { createNestApp } from '../../../../../../test/jest-e2e.setup';
 const seedRecords = [
   {
     id: 1,
-    ticket: '155430',
+    ticket: 155430,
     nome_colaborador: 'TAIS',
     tipo_exame: 'Admissional',
     status: 'Finalizado no SOC/GED',
   },
   {
     id: 2,
-    ticket: '155431',
+    ticket: 155431,
     nome_colaborador: 'JOAO',
     tipo_exame: 'Periodico',
     status: 'Pendente',
   },
   {
     id: 3,
-    ticket: '155432',
+    ticket: 155432,
     nome_colaborador: 'MARIA',
     tipo_exame: 'Admissional',
     status: 'Finalizado no SOC/GED',
@@ -151,7 +151,7 @@ describe('BaseGeralController (e2e)', () => {
       });
       expect(response.body.data[0]).toMatchObject({
         id: 1,
-        ticket: '155430',
+        ticket: 155430,
         nomeColaborador: 'TAIS',
         tipoExame: 'Admissional',
         status: 'Finalizado no SOC/GED',
@@ -179,12 +179,12 @@ describe('BaseGeralController (e2e)', () => {
 
       const response = await request(app.getHttpServer())
         .get('/exam/base-geral')
-        .query({ ticket: '155431' })
+        .query({ ticket: 155431 })
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.data).toHaveLength(1);
-      expect(response.body.data[0].ticket).toBe('155431');
+      expect(response.body.data[0].ticket).toBe(155431);
       expect(response.body.meta.total).toBe(1);
     });
 
@@ -283,6 +283,53 @@ describe('BaseGeralController (e2e)', () => {
       expect(response.body.message).toContain(
         'limit must not be greater than 100',
       );
+    });
+  });
+  describe('GET /exam/base-geral/:id', () => {
+    it('returns 401 without Authorization header', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/exam/base-geral/1')
+        .expect(401);
+
+      expect(response.body.message).toEqual('Unauthorized');
+    });
+
+    it('returns 200 with the correct record', async () => {
+      await seedBaseGeral();
+      const token = await getAccessToken(app, userManagementService);
+
+      const response = await request(app.getHttpServer())
+        .get('/exam/base-geral/1')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      expect(response.body).toMatchObject({
+        id: 1,
+        ticket: 155430,
+        nomeColaborador: 'TAIS',
+        tipoExame: 'Admissional',
+        status: 'Finalizado no SOC/GED',
+      });
+    });
+
+    it('returns 404 when id does not exist', async () => {
+      const token = await getAccessToken(app, userManagementService);
+
+      const response = await request(app.getHttpServer())
+        .get('/exam/base-geral/9999')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(404);
+
+      expect(response.body.message).toContain('9999');
+    });
+
+    it('returns 400 for non-numeric id', async () => {
+      const token = await getAccessToken(app, userManagementService);
+
+      await request(app.getHttpServer())
+        .get('/exam/base-geral/abc')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(400);
     });
   });
 });
