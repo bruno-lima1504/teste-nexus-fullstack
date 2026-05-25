@@ -15,7 +15,7 @@ export const examDataSourceOptionsFactory = (
   synchronize: false,
   migrationsRun: false,
   migrations: [],
-  ...(process.env.NODE_ENV !== 'test'
+  ...(process.env.NODE_ENV === 'development'
     ? { ssl: { rejectUnauthorized: false } }
     : {}),
   entities: [join(__dirname, 'entity', '*.entity.{ts,js}')],
