@@ -26,6 +26,12 @@ export const factory = (): Config => {
     jwt: {
       secret: process.env.JWT_SECRET,
     },
+    throttler: {
+      ttl: process.env.THROTTLER_TTL,
+      limit: process.env.THROTTLER_LIMIT,
+      signInLimit: process.env.THROTTLER_SIGN_IN_LIMIT,
+      registerLimit: process.env.THROTTLER_REGISTER_LIMIT,
+    },
   });
 
   if (result.success) {
