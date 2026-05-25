@@ -29,14 +29,14 @@ export class BaseGeral {
   @Column({ name: 'data_exame', type: 'date', nullable: true })
   dataExame?: string;
 
-  @Column({ name: 'unidade_preferencial', nullable: true })
-  unidadePreferencial?: string;
+  @Column({ name: 'cidade_preferencia', nullable: true })
+  cidadePreferencia?: string;
 
-  @Column({ name: 'agendamento_encaminhamento_aso', nullable: true })
-  agendamentoEncaminhamentoAso?: string;
+  @Column({ name: 'agendar_enquadramento_pcd', nullable: true })
+  agendarEnquadramentoPcd?: string;
 
-  @Column({ name: 'possui_formulario_aso', nullable: true })
-  possuiFormularioAso?: string;
+  @Column({ name: 'possui_formulario_rac', nullable: true })
+  possuiFormularioRac?: string;
 
   @Column({ name: 'possui_exames_complementares', nullable: true })
   possuiExamesComplementares?: string;
@@ -44,12 +44,12 @@ export class BaseGeral {
   @Column({ name: 'data_conclusao_dia', type: 'date', nullable: true })
   dataConclusaoDia?: string;
 
-  @Column({ name: 'status_da_agendamento', nullable: true })
-  statusDaAgendamento?: string;
+  @Column({ name: 'status_sla_agendamento', nullable: true })
+  statusSlaAgendamento?: string;
 
   @Column({ name: 'data_ultima_alteracao', type: 'date', nullable: true })
   dataUltimaAlteracao?: string;
 
-  @Column({ name: 'status_agendamento_tipo_solicitacao', nullable: true })
-  statusAgendamentoTipoSolicitacao?: string;
+  @Column({ name: 'dados_agendamento_tipo_solicitacao', nullable: true })
+  dadosAgendamentoTipoSolicitacao?: string;
 }
