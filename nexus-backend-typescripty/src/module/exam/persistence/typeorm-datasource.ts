@@ -1,0 +1,18 @@
+import { examDataSourceOptionsFactory } from '@examModule/persistence/typeorm-datasource.factory';
+import { NestFactory } from '@nestjs/core';
+import { ConfigModule } from '@sharedModule/config/config.module';
+import { ConfigService } from '@sharedModule/config/service/config.service';
+import { config } from 'dotenv';
+import { DataSource } from 'typeorm';
+
+config();
+
+const getDataSource = async () => {
+  const configModule = await NestFactory.createApplicationContext(
+    ConfigModule.forRoot(),
+  );
+  const configService = configModule.get<ConfigService>(ConfigService);
+  return new DataSource(examDataSourceOptionsFactory(configService));
+};
+
+export default getDataSource();
