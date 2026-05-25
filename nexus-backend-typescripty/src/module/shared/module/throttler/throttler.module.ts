@@ -1,9 +1,11 @@
 import { Global, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerModule as NestThrottlerModule } from '@nestjs/throttler';
+import {
+  ThrottlerGuard,
+  ThrottlerModule as NestThrottlerModule,
+} from '@nestjs/throttler';
 import { ConfigModule } from '@sharedModule/config/config.module';
 import { ConfigService } from '@sharedModule/config/service/config.service';
-import { AppThrottlerGuard } from '@sharedModule/throttler/guard/app-throttler.guard';
 
 @Global()
 @Module({
@@ -16,6 +18,7 @@ import { AppThrottlerGuard } from '@sharedModule/throttler/guard/app-throttler.g
           name: 'default',
           ttl: configService.get('throttler.ttl'),
           limit: configService.get('throttler.limit'),
+          skipIf: () => configService.get('env') === 'test',
         },
       ],
     }),
@@ -23,7 +26,7 @@ import { AppThrottlerGuard } from '@sharedModule/throttler/guard/app-throttler.g
   providers: [
     {
       provide: APP_GUARD,
-      useClass: AppThrottlerGuard,
+      useClass: ThrottlerGuard,
     },
   ],
 })
